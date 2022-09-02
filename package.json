@@ -1,0 +1,18 @@
+{
+    "devDependencies": {
+        "@types/jest": "^29.0.0",
+        "jest": "^29.0.1"
+    },
+    "name": "merchants-guide-to-the-galaxy",
+    "version": "0.1.0",
+    "description": "Merchant's Guide to the Galaxy",
+    "main": "src/m-guide-to-the-galaxy.js",
+    "dependencies": {
+        "roman-numerals-api": "^1.0.6"
+    },
+    "scripts": {
+        "test": "jest"
+    },
+    "author": "Christian Nitzsche",
+    "license": "ISC"
+}
