@@ -1,8 +1,10 @@
 const { parse } = require('roman-numerals-api');
 
-const regExRomans = /(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$)/;
-
-input = [
+const NO_COMMAND_MATCHED = 'I have no idea what you are talking about';
+const initReturnObject = { isMatch: false, output: null };
+let aliases = [];
+let goodsValues = [];
+let input = [
     'glob is I',
     'prok is V',
     'pish is X',
@@ -17,116 +19,181 @@ input = [
     'how much wood could a woodchuck chuck if a woodchuck could chuck wood ?'
 ];
 
-let output = [];
-let aliases = [];
-let goodsValues = [];
 
 
-/***************************
- ****  Handle Commands  ****
- ***************************/
-const addAlias = (regEx) => {
-    aliases = [...aliases, { name: regEx[1], roman: regEx[2] }];
-    // console.log('addAlias -> ', aliases);
-
-    // *Output
-    // [ { name: 'glob', roman: 'I' },
-    //   { name: 'prok', roman: 'V' },
-    //   { name: 'pish', roman: 'X' },
-    //   { name: 'tegj', roman: 'L' } ]
-}
-
-const addGoodsAmount = (regEx) => {
-    goodsValues = [...goodsValues, { roman: regEx[1], item: regEx[2], value: regEx[3] }];
-
-    // console.log(goodsValues);
-    // *Output
-    // [ { roman: 'glob glob', item: 'Silver', value: '34' },
-    //   { roman: 'glob prok', item: 'Gold', value: '57800' },
-    //   { roman: 'pish pish', item: 'Iron', value: '3910' } ]
-}
-
-const calcHowMuch = (regEx) => {
-    return 'test';
+const readCmd = (cmd) => {
+  console.log(' > '+ cmd);
+  let res = analyseCmd(cmd);
+  if(res.output)   console.log(res.output);
+  if(!res.isMatch) console.log(NO_COMMAND_MATCHED);
 }
 
 
-/**************************
- ****  Check Commands  ****
- **************************/
+const analyseCmd = (cmd) => { 
+  // Output: { isMatch: bool, output: string } | true | false
+  commands = [cmdAlias, cmdValues, cmdHowMuch, cmdHowMany];
+  let res = null;
+
+  commands.some((cmdFkt, i) => {
+      res = cmdFkt(cmd);
+      if (res.isMatch) {
+          return res.output || true;  // if return true -> NO Error Msg, command was handled correctly
+      }
+  });
+  return res;
+}
+
+
+const translateKauderwelsch = (kauderwelsch, aliases) => {
+  if (!kauderwelsch) return null;
+
+  // Input: 'glob prok tegj', aliases[] 
+  // -> Roman number ("IV") 
+  // -> Output: number | null (Converted Roman Number)
+  try {
+      let romNum = cleanStr(kauderwelsch)
+          .split(' ')
+          .map(word => {
+              let res = aliases.find(({ name }) => name === word.trim());
+              if (!res && word !== '') {
+                throw new Error(`What is '${word}'? Please correct your command!`);
+              }
+              return res.roman || '';
+          })
+          .join('');
+      return parse(romNum);
+
+  } catch (err) {
+      console.error('Error! ->', err.message);
+      return null;
+  }
+}
+
+const cleanStr = (str) => {
+    if (!str) return str;
+    return str.trim()
+              .toLowerCase()
+              .replace(/\s+/g, ' ');
+}
+
+
+
 const cmdAlias = (cmd) => {
-    if (!cmd) return null;
+  if (!cmd) return null;
 
-    let result = { matched: false, output: null }
-    let regEx = cmd.match(/\s*([a-zA-Z]+)\s+(is|Is|IS|iS)\s+([IVXLCDM]+)\s*$/);
-    if (regEx) {
-        // console.log('cmdAlias ->', regEx);
-        addAlias(regEx);
-        result.matched = true;
-    }
-    return result;
+  let result = {...initReturnObject};
+  let regEx = cmd.match(/\s*([a-zA-Z]+)\s+(is|Is|IS|iS)\s+([IVXLCDM]+)\s*$/);
+  if (regEx) {
+      addAlias(regEx);
+      result.isMatch = true;
+  }
+ 
+  return result;
 }
+
+const addAlias = (regExResult) => {
+  // *Output (global var) -> [ { name: 'glob', roman: 'I' }, ... ]
+  let newAlias = { 
+    name: cleanStr(regExResult[1]), 
+    roman: regExResult[3].trim().toUpperCase()
+  }
+  aliases = [...aliases, newAlias];
+}
+
+
 
 const cmdValues = (cmd) => {
-    let result = { matched: false, output: null }
+  if (!cmd) return null;
+  let result = {...initReturnObject};
     let regEx = cmd.match(/\s*(.*)\s+(\S+)\s+is\s+([0-9]+)\s+Credits\s*$/i);
     if (regEx) {
         addGoodsAmount(regEx)
-        result.matched = true;
+        result.isMatch = true;
     }
     return result;
 }
+
+const addGoodsAmount = (regExResult) => {
+  // *Output (global var) -> [ { count: 20, item: 'Iron', value: '3910' }, ... ]
+  let kauderwelsch = regExResult[1];
+  let decNum = translateKauderwelsch(kauderwelsch, aliases);
+  if (decNum) {
+      let newGood = {
+          count: decNum,
+          item: cleanStr(regExResult[2]),
+          value: regExResult[3]
+      }
+      goodsValues = [...goodsValues, newGood];
+  }
+}
+
+
 
 const cmdHowMuch = (cmd) => {
-    let result = { matched: false, output: null }
+  // Input: how much is pish tegj glob glob ?   
+  // -> translate: regEx[1] ('pish tegj glob glob') into decNum
+  // -> Output: pish tegj glob glob is 42 Credits
+  let result = {...initReturnObject};
+  if (!cmd) return result;
     let regEx = cmd.match(/\s*how\s+much\s+is\s+(.*)\s*\?\s*$/i);
-    // console.log('cmdHowMuch(regEx):', regEx);
-    if (regEx) {
-        result.output = calcHowMuch(regEx);
-        result.matched = true;
-    }
-    // how much is pish tegj glob glob ?   -> (regEx[1]) 'pish tegj glob glob',
+    if (!regEx) return result;
+    
+    result.output = calcHowMuch(regEx);
+    result.isMatch = true;
+    
     return result;
 }
+
+const calcHowMuch = (regExResult) => {
+  let kauderwelsch = cleanStr(regExResult[1]);
+  let decNum = translateKauderwelsch(kauderwelsch, aliases)
+  return decNum
+    ? `${kauderwelsch} is ${decNum} Credits`
+    : null;
+}
+
+
 
 const cmdHowMany = (cmd) => {
-    let result = { matched: false, output: null }
-        // console.log('cmdHowMany:', cmd);
-
-    return result;
+  let result = {...initReturnObject};
+  if (!cmd) return result;
+  
+  // Input: 'how many Credits is glob prok Silver ?'
+  // -> Output: 'glob prok Silver is 68 Credits'
+  let regEx = cmd.match(/\s*how\s+many\s+credits\s+is\s+(.*)\s+([a-z]+)\s*\?\s*$/i);
+  if (!regEx || regEx[2].trim() === '') return result;  // regEx[2] = goods <- if goods from regEx is empty: ''
+  
+  result.isMatch = true;
+  result.output = calcHowMany(regEx);
+  return result;
 }
 
-const analyseCmd = (cmd) => {
-    commands = [cmdAlias, cmdValues, cmdHowMuch, cmdHowMany];
-    let res;
-    commands.forEach(element => {
-        res = element(cmd);
-        if (res.matched && res.output)
-            output = [...output, res.output];
-    });
+const calcHowMany = (regExResult) => {
+    if (!regExResult) return null;
+    
+    let kauderwelsch = cleanStr(regExResult[1]);
+    let count = translateKauderwelsch(kauderwelsch, aliases); // 4 | null
+    if (!count) return null;
+
+    let goods = regExResult[2].trim(); // Silver, Gold, Iron
+    let basisItem = goodsValues.find(({ item }) => item.toLowerCase() === goods.toLowerCase());
+    
+    return basisItem          // rule of three _ Dreisatz
+      ? `${kauderwelsch} ${goods} is ${count * basisItem.value / basisItem.count} Credits`
+      : null;
 }
 
-/****************
- ****  init  ****
- ****************/
-const readCommands = (commandsArray) => {
-    commandsArray.map(cmd => {
-        let analysedCmd = analyseCmd(cmd);
-        console.log('->', cmd);
-        if (analysedCmd !== false) {
-            output.push(analysedCmd);
-        }
-    });
-    console.log('####### OUTPUT #######');
-    console.log(output);
-}
-
-readCommands(input);
 
 
-
+/* Task input */
+input.forEach(item => {
+  readCmd(item);
+});
 
 /***** Test-Exports *****/
 exports.input = input;
 exports.cmdAlias = cmdAlias;
 exports.cmdValues = cmdValues;
+exports.cmdHowMuch = cmdHowMuch;
+exports.cmdHowMany = cmdHowMany;
+exports.translateKauderwelsch = translateKauderwelsch;

@@ -61,13 +61,3 @@ it("Test#1", () => {
     expect(() => parse('MMMM')).toThrow();
     expect(() => parse('MMMMD')).toThrow();
 });
-
-
-/* 
-Die Symbole „I“, „X“, „C“ und „M“ können dreimal hintereinander wiederholt werden, aber nicht mehr. (Sie können viermal vorkommen, wenn die dritte und die vierte durch einen kleineren Wert getrennt sind, z. B. XXXIX.) 
-„D“, „L“ und „V“ können niemals wiederholt werden.
-„I“ kann nur von „V“ und „X“ subtrahiert werden.
-„X“ kann nur von „L“ und „C“ subtrahiert werden. 
-C“ kann nur von „D“ und „M“ subtrahiert werden.
-"V", "L" und "D" können niemals subtrahiert werden.
-Von jedem Symbol mit großem Wert darf nur ein Symbol mit kleinem Wert subtrahiert werden.*/
