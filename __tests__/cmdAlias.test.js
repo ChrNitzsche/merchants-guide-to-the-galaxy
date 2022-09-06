@@ -1,4 +1,4 @@
-const { input, cmdAlias } = require('../src/m-guide-to-the-galaxy');
+const { input, cmdAlias } = require('../src/');
 
 it('Testing null and empty', () => {
     expect(cmdAlias(null)).toBeNull();

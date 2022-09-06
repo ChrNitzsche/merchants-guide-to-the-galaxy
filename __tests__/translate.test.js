@@ -1,4 +1,4 @@
-const { translateKauderwelsch } = require('../src/m-guide-to-the-galaxy');
+const { translateKauderwelsch } = require('../src/');
 
 const aliasesArr = [
   { name: 'glob', roman: 'I' },

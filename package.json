@@ -6,7 +6,7 @@
     "name": "merchants-guide-to-the-galaxy",
     "version": "0.1.0",
     "description": "Merchant's Guide to the Galaxy",
-    "main": "src/m-guide-to-the-galaxy.js",
+    "main": "src/index.js",
     "dependencies": {
         "roman-numerals-api": "^1.0.6"
     },

@@ -1,4 +1,4 @@
-const { cmdHowMany } = require('../src/m-guide-to-the-galaxy');
+const { cmdHowMany } = require('../src');
 
 const resultYes = { 
   isMatch: true, 

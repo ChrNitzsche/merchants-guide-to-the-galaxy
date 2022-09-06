@@ -34,7 +34,7 @@ const analyseCmd = (cmd) => {
   commands = [cmdAlias, cmdValues, cmdHowMuch, cmdHowMany];
   let res = null;
 
-  commands.some((cmdFkt, i) => {
+  commands.some((cmdFkt) => {
       res = cmdFkt(cmd);
       if (res.isMatch) {
           return res.output || true;  // if return true -> NO Error Msg, command was handled correctly

@@ -1,4 +1,4 @@
-const { cmdValues } = require('../src/m-guide-to-the-galaxy');
+const { cmdValues } = require('../src/');
 
 const initObj = { 
   isMatch: true, 
