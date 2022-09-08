@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist",
+    "target": "ESNext",
+    "lib": ["es2021.intl"],
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "strictNullChecks": false,
+    "alwaysStrict": true, 
+    "rootDir": "src",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "emitDeclarationOnly": true,
+    // Ensure that Babel can safely transpile files in the TypeScript project
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+  },
+  "include": ["./src"],
+  "files" : [
+    "src/index.ts",
+    "node_modules"
+  ]
+}
