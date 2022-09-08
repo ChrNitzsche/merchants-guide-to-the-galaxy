@@ -1,11 +1,15 @@
 # Merchant's Guide to the Galaxy
 ### JavaScript, npm
-### Testing via Jest
+### TypeScript
+### Testing via Jest (tests only work with this originally index.js-file yet!)
 <br><br>
 
-## start the program: 
+## Starting the program: 
 ### (1) 'npm install' from this project folder
-### (2) execute src/index.js (i.e. node index.js; or Ctrl+Alt+N in VS Code/Windows)
+### (2) if you want to use TypeScript: tsc ./src/index.ts --outFile index.ts.js
+### (3) execute src/index.js [or /src/index.ts.js]
+#### (i.e. node index.js; or Ctrl+Alt+N in VS Code/Windows)
+
 
 <br><br>
 ## Problem Description
