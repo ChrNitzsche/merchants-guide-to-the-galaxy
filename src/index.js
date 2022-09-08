@@ -31,7 +31,7 @@ const readCmd = (cmd) => {
 
 const analyseCmd = (cmd) => { 
   // Output: { isMatch: bool, output: string } | true | false
-  commands = [cmdAlias, cmdValues, cmdHowMuch, cmdHowMany];
+  let commands = [cmdAlias, cmdValues, cmdHowMuch, cmdHowMany];
   let res = null;
 
   commands.some((cmdFkt) => {
